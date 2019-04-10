@@ -55,7 +55,7 @@
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath></ListingPath>
+          <ListingPath>.\Listing\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -335,9 +335,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_LL_DRIVER,USE_HAL_DRIVER,STM32F427xx</Define>
+              <Define>USE_LL_DRIVER,USE_HAL_DRIVER,STM32F427xx,ARM_MATH_CM4,__FPU_PRESENT=1, __CC_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\System</IncludePath>
+              <IncludePath>..\APP\Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\System\delay;..\APP\ADRC;..\APP\AHRS;..\System\sys</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -379,57 +379,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Application/MDK-ARM</GroupName>
+          <GroupName>STARTUP</GroupName>
           <Files>
             <File>
               <FileName>startup_stm32f427xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>startup_stm32f427xx.s</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Application/User</GroupName>
-          <Files>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/main.c</FilePath>
-            </File>
-            <File>
-              <FileName>gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/can.c</FilePath>
-            </File>
-            <File>
-              <FileName>dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/stm32f4xx_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/stm32f4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\tim.c</FilePath>
+              <FilePath>..\startup\startup_stm32f427xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -516,60 +471,175 @@
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Drivers/CMSIS</GroupName>
+          <GroupName>CMSIS</GroupName>
           <Files>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\CMSIS\stm32f4xx_it.c</FilePath>
+            </File>
             <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..//Src/system_stm32f4xx.c</FilePath>
+              <FilePath>..\Drivers\CMSIS\system_stm32f4xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_cortexM4lf_math.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\Drivers\CMSIS\Lib\ARM\arm_cortexM4lf_math.lib</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/Control</GroupName>
+          <GroupName>APP</GroupName>
           <Files>
             <File>
-              <FileName>Remote_Ctrl.c</FileName>
+              <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\Remote_Ctrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>DataScope_DP.C</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\DataScope_DP.C</FilePath>
-            </File>
-            <File>
-              <FileName>Shoot_Ctrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\Shoot_Ctrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>Motor_Func.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\Motor_Func.c</FilePath>
+              <FilePath>..\APP\Src\main.c</FilePath>
             </File>
             <File>
               <FileName>Can_Ctrl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\Can_Ctrl.c</FilePath>
+              <FilePath>..\APP\Src\Can_Ctrl.c</FilePath>
             </File>
             <File>
               <FileName>Control_Loop.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\Control_Loop.c</FilePath>
+              <FilePath>..\APP\Src\Control_Loop.c</FilePath>
+            </File>
+            <File>
+              <FileName>DataScope_DP.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\DataScope_DP.C</FilePath>
+            </File>
+            <File>
+              <FileName>Motor_Ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\Motor_Ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>Remote_Ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\Remote_Ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>Shoot_Ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\Shoot_Ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\imu.c</FilePath>
+            </File>
+            <File>
+              <FileName>adrc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\ADRC\adrc.c</FilePath>
+            </File>
+            <File>
+              <FileName>ins.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\ins.c</FilePath>
+            </File>
+            <File>
+              <FileName>Pc_Uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\Pc_Uart.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>System</GroupName>
+          <GroupName>SYSTEM</GroupName>
           <Files>
             <File>
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\System\sys.c</FilePath>
+              <FilePath>..\System\sys\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\delay\delay.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>HARDWARE</GroupName>
+          <Files>
+            <File>
+              <FileName>can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\can.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Src\spi.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>AHRS</GroupName>
+          <Files>
+            <File>
+              <FileName>AHRS_middleware.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\AHRS\AHRS_middleware.c</FilePath>
+            </File>
+            <File>
+              <FileName>ist8310driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\AHRS\ist8310driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>ist8310driver_middleware.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\AHRS\ist8310driver_middleware.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6500driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\AHRS\mpu6500driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6500driver_middleware.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\AHRS\mpu6500driver_middleware.c</FilePath>
+            </File>
+            <File>
+              <FileName>AHRS.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\APP\AHRS\AHRS.lib</FilePath>
             </File>
           </Files>
         </Group>
