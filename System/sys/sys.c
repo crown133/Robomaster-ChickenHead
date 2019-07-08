@@ -80,7 +80,7 @@ void SysNVIC_SetPriority(void)
 //	HAL_NVIC_SetPriority(CAN1_TX_IRQn, 0, 2);
 //    HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
 
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 1, 1);
+    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 1, 2);
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
 	/********* CAN2 interrupt Init *********/
 //    HAL_NVIC_SetPriority(CAN2_TX_IRQn, 1, 1);
@@ -92,51 +92,70 @@ void SysNVIC_SetPriority(void)
     HAL_NVIC_SetPriority(USART1_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 	
+	/******** USART3 interrupt Init ********/  //裁判系统
+    HAL_NVIC_SetPriority(USART3_IRQn, 2, 1);
+    HAL_NVIC_EnableIRQ(USART3_IRQn);
+	
+	/******** USART6 interrupt Init ********/  //HMW电机
+    HAL_NVIC_SetPriority(USART6_IRQn, 1, 3);
+    HAL_NVIC_EnableIRQ(USART6_IRQn);
+	
     /* UART7 interrupt Init */
-    HAL_NVIC_SetPriority(UART7_IRQn, 1, 4);
+    HAL_NVIC_SetPriority(UART7_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(UART7_IRQn);
 	
-	/******** UART8 interrupt Init *********/
-    HAL_NVIC_SetPriority(UART8_IRQn, 2, 5);
+	/******** UART8 interrupt Init IMU*********/
+    HAL_NVIC_SetPriority(UART8_IRQn, 1, 1);
     HAL_NVIC_EnableIRQ(UART8_IRQn);
 	
 	/***************** tim3  ****************/
-	HAL_NVIC_SetPriority(TIM3_IRQn, 0, 2);  //control loop
+	HAL_NVIC_SetPriority(TIM3_IRQn, 0, 1);  //control loop
     HAL_NVIC_EnableIRQ(TIM3_IRQn);
 	
 	/***************** tim5 ****************/
 //	HAL_NVIC_SetPriority(TIM5_IRQn, 1, 4);  //霍尔捕获输入
 //  HAL_NVIC_EnableIRQ(TIM5_IRQn);
   /* DMA interrupt init */
-  /* DMA1_Stream1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 1, 6); //串口7接收
+ 
+  /* DMA1_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 1, 6); //串口7电脑接收
   HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
   /* DMA1_Stream2_IRQn interrupt configuration */  
 //  HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 1, 3); //霍尔1
 //  HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
-//  /* DMA1_Stream4_IRQn interrupt configuration */
+  /* DMA1_Stream4_IRQn interrupt configuration */
 //  HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 1, 2); //霍尔2
 //  HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
   /* DMA1_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 1, 3); //IMU模块JY901
+  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 1, 1); //串口8IMU模块JY901
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+  
+  /* DMA2_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 2, 1); //串口6 HMW电机接收
+  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 	
-  /* DMA2_Stream2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 1, 1); //DBUS
+  /* DMA2_Stream6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 1, 8); //串口6 HMW电机发送
   HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
-	
+
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 1, 0); //DBus
+  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+
 	//MPU6000 外部中断读取dma
   /* DMA2_Stream4_IRQn interrupt configuration */
 //  HAL_NVIC_SetPriority(DMA2_Stream4_IRQn, 0, 0);  //SPI5  TX
 //  HAL_NVIC_EnableIRQ(DMA2_Stream4_IRQn);
-  /* DMA2_Stream5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 1, 5);  //SPI5  RX
-  HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+
+//  /* DMA2_Stream5_IRQn interrupt configuration */
+//  HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 1, 5);  //SPI5  RX
+//  HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+  
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 1, 4);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 1, 5);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
   
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 3);
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 4);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
   //
 }

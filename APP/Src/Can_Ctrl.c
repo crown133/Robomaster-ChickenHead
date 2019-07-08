@@ -33,7 +33,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 					{
 //						motorPitch.posCtrl.rawPosLast = motorPitch.posCtrl.rawPos;
 //						motorPitch.posCtrl.rawPos = (int16_t)(hcan->pRxMsg->Data[0] << 8 | hcan->pRxMsg->Data[1]);  //实际位置
-						motorPitch.veloCtrl.rawVel = (int16_t)(hcan->pRxMsg->Data[2] << 8 | hcan->pRxMsg->Data[3]);//实际速度
+//						motorPitch.veloCtrl.rawVel = (int16_t)(hcan->pRxMsg->Data[2] << 8 | hcan->pRxMsg->Data[3]);//实际速度
 						CAN_MotorRxMsgConv(hcan, &motorPitch);
 					}break; 
 				 //CAN1, 拨蛋轮电机
@@ -60,19 +60,18 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
   *         the configuration information for the specified CAN.
   *	@retval	None
   */
-float detaPos = 0;
-float temperature = 0;
+float temperature = 0;  //GM6020电机显示温度
+
 void CAN_MotorRxMsgConv(CAN_HandleTypeDef *hcan, Motor_t *motor)
 {
-	detaPos = 0;
-	  //
 	if(initFlag)
 	{
 		motor->posCtrl.rawPosLast = motor->posCtrl.rawPos;
 		motor->posCtrl.rawPos = (int16_t)(hcan->pRxMsg->Data[0] << 8 | hcan->pRxMsg->Data[1]);  //实际位置
-		motor->veloCtrl.rawVel = (int16_t)(hcan->pRxMsg->Data[2] << 8 | hcan->pRxMsg->Data[3]);//实际速度
+
 		motor->posCtrl.relaPos = motor->posCtrl.rawPos;
 	}
+	motor->veloCtrl.rawVel = (int16_t)(hcan->pRxMsg->Data[2] << 8 | hcan->pRxMsg->Data[3]);//实际速度
 	motor->posCtrl.motorPos = (int16_t)(hcan->pRxMsg->Data[0] << 8 | hcan->pRxMsg->Data[1]);  //实际位置
 	
 	motor->torque = (int16_t)(hcan->pRxMsg->Data[4] << 8 | hcan->pRxMsg->Data[5]);  //实际转矩
@@ -81,20 +80,8 @@ void CAN_MotorRxMsgConv(CAN_HandleTypeDef *hcan, Motor_t *motor)
 	{
 		temperature = hcan->pRxMsg->Data[6]; //温度
 	}
-//	detaPos = motor->posCtrl.rawPos - motor->posCtrl.rawPosLast;
-//	
-//		if (detaPos > 5000)		//反转过一圈 向下 -
-//		{
-//			motor->posCtrl.round --;
-//		}
-//		else if (detaPos < -5000)	//正转过一圈
-//		{
-//			motor->posCtrl.round ++;
-//		}
-//	motor->posCtrl.relaPos = motor->posCtrl.rawPos + motor->posCtrl.round * 8192;
-	
-
 }
+
 
 /**
 	*	@brief	转换发送给Motor的数据格式
@@ -125,7 +112,7 @@ uint8_t CAN_CMD_GIMBAL(int16_t Yaw, int16_t Pitch, int16_t Bodan, int16_t rev)
 	hcan1.pTxMsg->Data[6] = (uint8_t)(rev >> 8);
 	hcan1.pTxMsg->Data[7] = (uint8_t)rev;
 	
-	if(HAL_CAN_Transmit(&hcan1, 10) != HAL_OK)
+	if(HAL_CAN_Transmit(&hcan1, 0) != HAL_OK)
 	return 0;
 	
 	return 1;

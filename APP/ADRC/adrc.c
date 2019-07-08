@@ -213,6 +213,23 @@ static void ADRC_ESO_3N(ADRC_Data *adrc)
 	adrc->z2 += adrc->eso_h*(adrc->z3 - adrc->beta_02*adrc->fe + adrc->u*adrc->b0);
 	adrc->z3 += adrc->eso_h*(-adrc->beta_03*adrc->fe1);//ESO估计状态加速度信号，进行扰动补偿
 }
+//inline void LESO_Init(ESO* eso,)
+//{
+//	eso->b0 = 
+//	eso->beta_01 = ;
+//	eso->beta_02 = ;
+//	eso->beta_03 = ;
+//	eso->h = ;
+//	eso->z1 = eso->z2 = eso->z3 = 0;
+//}
+
+inline void ADRC_LESO(ESO* eso, float y)
+{
+	eso->e = y - eso->z1;
+	eso->z3 += eso->h * (eso->beta_03*eso->e);
+	eso->z2 += eso->h * (eso->z3 + eso->beta_02*eso->e + eso->b0*eso->u);
+	eso->z1 += eso->h * (eso->z2 + eso->beta_01*eso->e);
+}
 
 /********* 非线性状态误差反馈 ***********/
 static void ADRC_NLSEF2(ADRC_Data *adrc)  //组合方式：u0=beta_1*fal(e1,alpha1,delta)+beta_2*fal(e2,alpha2,delta)

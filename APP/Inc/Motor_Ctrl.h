@@ -16,6 +16,7 @@ typedef struct
 	float refVel_Soft;
 	float refVel;
 	float rawVel;	//实际速度
+	float filrawVel;
 	
 	float acc;		//速度控制中加速的加速度
 	float dec;		//速度控制中减速的加速度

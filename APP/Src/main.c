@@ -1,4 +1,3 @@
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
@@ -8,6 +7,8 @@
 #include "usart.h"
 #include "gpio.h"
 #include "Pc_Uart.h"
+#include "Remote_Ctrl.h"
+#include "Referee_Comm.h"
 
 #include "sys.h"
 #include "delay.h"
@@ -18,82 +19,105 @@
 #include "adrc.h"
 #include "ins.h"
 /*---------------------------------------------------------*/
+
 void SystemClock_Config(void);
 
 unsigned int initFlag = 1; //云台位置初始化
+unsigned int sendFlag = 0;
 
 int main(void)
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-  /* Configure the system clock */
   SystemClock_Config();
 
   delay_init(168);
+	
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_CAN1_Init();
   MX_USART1_UART_Init();  //DBus
-  MX_UART7_Init();        //串口通信
-  MX_UART8_Init();		//JY901
-	
-  MX_TIM4_Init();		  //PWM输出，驱动Snail电机 周期2ms
+  MX_USART3_UART_Init();  //与裁判系统通信
+//  MX_USART6_UART_Init();  //俯仰轴电机
+//  data_head_init();	  //我方为红方，裁判系统初始化
+////  data_head_blue_init();//我方为蓝方，裁判系统初始化
+//  
+//MX_UART7_Init();        //与电脑串口通信
+  MX_UART8_Init();		  //JY901
+
+  MX_TIM4_Init();		//PWM输出，驱动Snail电机 周期2ms
   MX_TIM3_Init();  		//定时器3中断，总控制中断
 //MX_TIM5_Init();  		//摩擦轮霍尔捕获输入
 	
   CANFilter_Init(&hcan1);
 	
-//  INS_Init();
+////  INS_Init();  //mpu6500初始化配置
   
   SysNVIC_SetPriority();  //统一在此设置优先级
+  
   delay_ms(500);
   
   /*********** Motor init position ***********/
-  Motor_IncPos(&(motorPitch.posCtrl), motorPitch.posCtrl.rawPos, 8000, -8000); //初始位置等于上电位置
-  Motor_IncPos(&(motorYaw.posCtrl), 4700, 6000, 3400); 
-  /********** motor control value set **********/
-  Motor_ValueSet(&motorPitch, 18, 0.02, 0.1, 8500, -8500, 20, \
-		0.02, 0.18, 8000, -8000, ENABLE);  				 //Pitch轴电机
+  Motor_IncPos(&(motorPitch.posCtrl), 2700, 5000, 2000); //初始位置等于上电位置
+  Motor_IncPos(&(motorYaw.posCtrl), 4865, 6000, 3400); 
   
+  /********** motor control value set **********/  
+  
+  Motor_ValueSet(&motorPitch, 6, 0.05, 20, 20000, -20000, 2, \
+		0.01, 20, 900, -900, DISABLE);  				 //Pitch轴电机
+		
   Motor_ValueSet(&motorYaw, 5, 0.1, 0, 20000, -20000, 2, \
 		0, 0.02, 600, -600, DISABLE);  //Yaw轴电机
 //  ADRC_Yaw_Init();
   
   Motor_ValueSet(&motorBodan, 6, 0, 0, 9000, -9000, 0, \
 		0, 0, 0, 0, DISABLE);  						 //拨蛋电机
+  
 
 /********** Tracking Differentiator Init *************/
-  TD_Init(&td1, 200, 0.085, 0.005);
-  TD_Init(&td2, 300, 0.05, 0.005);
+  TD_Init(&td1, 150, 0.05, 0.005);
+  TD_Init(&td2, 150, 0.05, 0.005);
   TD_Init(&tdYawPc, 300, 0.05, 0.005);
   TD_Init(&tdPitchPc, 3000, 0.085, 0.005);
   
-  delay_ms(100);
+  delay_ms(500);
   
-  /********************************************/
   HAL_TIM_Base_Start_IT(&htim3);  //开启中断
+  
+  delay_ms(500);
   
   while (1)
   {
-	  if((abs(motorYaw.posCtrl.rawPos - motorYaw.posCtrl.refPos) < 50) && initFlag) //电机模式切换
+	  sendFlag++;
+	  if(sendFlag == 1000000)  //裁判系统通讯
+	  {
+		sendFlag = 0;
+		SendDatabuild();
+		HAL_UART_Transmit(&huart3, USART3_DMA_TX_BUF, 28, 10);
+	  }
+	  if((abs(motorYaw.posCtrl.rawPos - motorYaw.posCtrl.refPos) < 100) && (abs(motorPitch.posCtrl.rawPos - motorPitch.posCtrl.refPos) < 100) && initFlag) //电机模式切换
   	  {
-		  
 		  initFlag = 0;
-		  motorYaw.posCtrl.posBias = JYgyro.gyroAnglez - 180;
-		  motorYaw.posCtrl.rawPos = 180;
-		  motorYaw.posCtrl.relaPos = 180;
-		  motorYaw.posCtrl.refPos = 180;
-		  Motor_ValueSet(&motorYaw, 35, 0.4, 0.01, 20000, -20000, -12.5, \
-						0, -0.02, 800, -800, DISABLE); 
+//		  motorYaw.posCtrl.posBias = JYgyro.gyroAnglez - 180;
+		  motorYaw.posCtrl.rawPos  = JYgyro.gyroAnglez;
+		  motorYaw.posCtrl.relaPos = JYgyro.gyroAnglez;
+		  motorYaw.posCtrl.refPos  = JYgyro.gyroAnglez;
+		
+		  Motor_ValueSet(&motorYaw, 116, 0.02, 0, 20000, -20000, -3.6, \
+						0, -1, 800, -800, DISABLE); 
 		  
-		  motorPitch.posCtrl.rawPos = JYgyro.gyroAngley;
-		  motorPitch.posCtrl.refPos = JYgyro.gyroAngley;
+		  motorPitch.posCtrl.refPos  = JYgyro.gyroAngley;
+		  motorPitch.posCtrl.relaPos = JYgyro.gyroAngley;
+		  motorPitch.posCtrl.rawPos  = JYgyro.gyroAngley;
+		  
+		  Motor_ValueSet(&motorPitch, 120, 0.02, 10, 20000, -20000, 3, \
+						0, 0, 800, -800, DISABLE);  				 //Pitch轴电机
 	  }
 	  
-	  ShootWheel_Control();
+	  ShootWheel_Control();  //摩擦轮设置
   }
-
+  
 }
 
 /********** 系统时钟配置 **********/

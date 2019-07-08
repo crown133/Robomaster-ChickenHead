@@ -33,5 +33,7 @@
 ..\obj\remote_ctrl.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 ..\obj\remote_ctrl.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 ..\obj\remote_ctrl.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+..\obj\remote_ctrl.o: ..\APP\Inc\Pc_Uart.h
+..\obj\remote_ctrl.o: ..\System\sys\sys.h
 ..\obj\remote_ctrl.o: ..\APP\Inc\Remote_Ctrl.h
 ..\obj\remote_ctrl.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h

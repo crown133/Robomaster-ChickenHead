@@ -4,8 +4,8 @@
 #include "stm32f4xx_hal.h"
 #include "CRC.h"
 
-#define BSP_USART6_DMA_RX_BUF_LEN 128u
-#define BSP_USART6_DMA_TX_BUF_LEN 30u
+#define BSP_USART3_DMA_RX_BUF_LEN 128u
+#define BSP_USART3_DMA_TX_BUF_LEN 30u
 
 #define FRAME_HEADER_LEN	sizeof(FrameHeader_t)
 #define CMD_ID_LEN					2u	//√¸¡Ó¬Î≥§∂»
@@ -189,8 +189,8 @@ typedef __packed struct
 
 extern ext_referee_data_t RefereeData_t;
 
-extern uint8_t USART6_DMA_RX_BUF[BSP_USART6_DMA_RX_BUF_LEN];
-extern uint8_t USART6_DMA_TX_BUF[BSP_USART6_DMA_TX_BUF_LEN];
+extern uint8_t USART3_DMA_RX_BUF[BSP_USART3_DMA_RX_BUF_LEN];
+extern uint8_t USART3_DMA_TX_BUF[BSP_USART3_DMA_TX_BUF_LEN];
 
 void Referee_Data_Receive_Start(void);
 

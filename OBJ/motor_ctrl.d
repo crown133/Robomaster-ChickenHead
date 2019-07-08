@@ -40,4 +40,5 @@
 ..\obj\motor_ctrl.o: ..\APP\Inc\usart.h
 ..\obj\motor_ctrl.o: ..\APP\Inc\Can_Ctrl.h
 ..\obj\motor_ctrl.o: ..\APP\Inc\can.h
+..\obj\motor_ctrl.o: ..\APP\Inc\HMW.h
 ..\obj\motor_ctrl.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h

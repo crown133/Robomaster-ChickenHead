@@ -41,7 +41,7 @@
 ..\obj\control_loop.o: ..\APP\Inc\can.h
 ..\obj\control_loop.o: ..\APP\Inc\Pc_Uart.h
 ..\obj\control_loop.o: ..\APP\Inc\Shoot_Ctrl.h
+..\obj\control_loop.o: ..\APP\Inc\HMW.h
+..\obj\control_loop.o: ..\APP\Inc\usart.h
 ..\obj\control_loop.o: ..\APP\Inc\imu.h
 ..\obj\control_loop.o: ..\System\delay\delay.h
-..\obj\control_loop.o: ..\APP\AHRS\mpu6500driver_middleware.h
-..\obj\control_loop.o: ..\APP\AHRS\mpu6500reg.h

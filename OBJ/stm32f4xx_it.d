@@ -45,4 +45,7 @@
 ..\obj\stm32f4xx_it.o: ..\APP\Inc\imu.h
 ..\obj\stm32f4xx_it.o: ..\APP\Inc\ins.h
 ..\obj\stm32f4xx_it.o: ..\APP\Inc\Pc_Uart.h
+..\obj\stm32f4xx_it.o: ..\APP\Inc\Referee_Comm.h
+..\obj\stm32f4xx_it.o: ..\APP\Inc\CRC.h
+..\obj\stm32f4xx_it.o: ..\APP\Inc\HMW.H
 ..\obj\stm32f4xx_it.o: ..\APP\AHRS\mpu6500driver_middleware.h

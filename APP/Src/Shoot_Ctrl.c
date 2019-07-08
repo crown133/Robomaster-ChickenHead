@@ -109,8 +109,6 @@ void ShootWheel_Control(void)
 	}
 		MocaWheelA = setVelo;
 		MocaWheelB = setVelo;
-	
-
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)

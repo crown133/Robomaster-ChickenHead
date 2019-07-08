@@ -40,6 +40,9 @@
 ..\obj\main.o: ..\APP\Inc\gpio.h
 ..\obj\main.o: ..\APP\Inc\Pc_Uart.h
 ..\obj\main.o: ..\System\sys\sys.h
+..\obj\main.o: ..\APP\Inc\Remote_Ctrl.h
+..\obj\main.o: ..\APP\Inc\Referee_Comm.h
+..\obj\main.o: ..\APP\Inc\CRC.h
 ..\obj\main.o: ..\System\delay\delay.h
 ..\obj\main.o: ..\APP\Inc\Motor_Ctrl.h
 ..\obj\main.o: ..\APP\ADRC\adrc.h

@@ -7,9 +7,9 @@
 
 typedef struct
 {
-	float gyroVelox;  //x轴角速度
-	float gyroVeloy;  //y轴角速度
-	float gyroVeloz;  //z轴角速度
+	int16_t gyroVelox;  //x轴角速度
+	int16_t gyroVeloy;  //y轴角速度
+	int16_t gyroVeloz;  //z轴角速度
 	
 	float gyroAnglex;  //x轴角度
 	float gyroAngley;  //y轴角度

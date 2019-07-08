@@ -42,6 +42,7 @@ typedef struct
 	struct
 	{
 		uint16_t v;//¼üÅÌ
+		uint8_t shift;
 	} key;
 	
 }RemoteCtrl_t;

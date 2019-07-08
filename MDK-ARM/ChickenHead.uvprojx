@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_LL_DRIVER,USE_HAL_DRIVER,STM32F427xx,ARM_MATH_CM4,__FPU_PRESENT=1, __CC_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\APP\Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\System\delay;..\APP\ADRC;..\APP\AHRS;..\System\sys</IncludePath>
+              <IncludePath>..\APP\Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\System\delay;..\APP\ADRC;..\APP\AHRS;..\System\sys;..\APP\Referee</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -555,6 +555,26 @@
               <FileName>Pc_Uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\Src\Pc_Uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>Referee_Comm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Referee\Referee_Comm.c</FilePath>
+            </File>
+            <File>
+              <FileName>CRC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\Referee\CRC.c</FilePath>
+            </File>
+            <File>
+              <FileName>HMW.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\APP\Inc\HMW.h</FilePath>
+            </File>
+            <File>
+              <FileName>ESO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\APP\ADRC\ESO.h</FilePath>
             </File>
           </Files>
         </Group>

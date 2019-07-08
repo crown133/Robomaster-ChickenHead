@@ -31,6 +31,8 @@
 "..\obj\adrc.o"
 "..\obj\ins.o"
 "..\obj\pc_uart.o"
+"..\obj\referee_comm.o"
+"..\obj\crc.o"
 "..\obj\sys.o"
 "..\obj\delay.o"
 "..\obj\can.o"
