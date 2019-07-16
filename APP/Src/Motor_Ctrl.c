@@ -2,16 +2,19 @@
 #include "DataScope_DP.h"
 #include "usart.h"
 #include "Can_Ctrl.h"
-#include "HMW.h"
 
 #include "math.h"
 
 #define limit_output(x, min, max)	( (x) <= (min) ? (min) : (x) >= (max) ? (max) : (x) )//限幅函数
 
 /**********************************************/
-TD td1, td2; 		  //速度环参考值使用跟踪微分器安排过渡过程
+TD td1, td2, td1_velo, td2_velo;; 		  //速度环参考值使用跟踪微分器安排过渡过程
 TD tdYawPc, tdPitchPc;//速度反馈值使用跟踪微分器进行微分
+ESO eso1;
+ESO_AngularRate eso2;
+
 ADRC_Data ADRC_Yaw;   //Yaw 电机 adrc控制体
+TD4 trackerYawInc, trackerPitchInc, trackerYaw, trackerPitch;
 
 /*********** 无人机云台中需要控制的电机 ************/
 Motor_t motorYaw, motorPitch, motorBodan;
@@ -23,18 +26,25 @@ static void motorYawCalcuPos(void);		//Yaw 电机位置环pid计算
 static void motorPitchCalcuPos(void);   //Pitch 电机位置环pid计算
 static void Motor_VeloCtrl(VeloPidCtrl_t *vel_t);  //速度环pid计算
 static inline void MotorFliter_VeloCtrl(VeloPidCtrl_t *vel_t);
+static inline void motor_pitch_veloCtrl(void);
 
 int posRaw, posOut, velRef, velOut;
-
+float kp=0.01, kd = 50;
 
 //云台电机计算控制函数
 void Gimbal_Control(void)
 {
 	/*	0x205  yaw */
 	motorYawCalcuPos(); 				//位置pid计算
-//	TD_Calculate(&td1, motorYaw.posCtrl.output);
-//	motorYaw.veloCtrl.refVel = td1.v1;  //速度参考值由跟踪微分器给出，来达到安排过渡过程的目的
-	motorYaw.veloCtrl.refVel = motorYaw.posCtrl.output;
+	TD_Calculate(&td1, motorYaw.posCtrl.output);
+//	ADRC_LESO(&eso1, motorYaw.veloCtrl.rawVel);
+//	eso1.u = kp*(td1.v1 - eso1.z1) + kd*(td1.v2 - eso1.z2) - eso1.z3/eso1.b0;
+	
+//	motorYaw.veloCtrl.output = limit_float(eso1.u, -10000, 10000);
+	
+//	TD4_track4(&trackerYaw, motorYaw.posCtrl.output, 1.0f/200);
+//	motorYaw.veloCtrl.refVel = trackerYaw.x1;
+	motorYaw.veloCtrl.refVel = td1.v1;
 	MotorFliter_VeloCtrl(&motorYaw.veloCtrl); //速度pid计算
 	
 //	ADRC_Control(&ADRC_Yaw, kp, motorYaw.veloCtrl.rawVel);
@@ -43,10 +53,17 @@ void Gimbal_Control(void)
 	/*  pitch	*/
 	motorPitchCalcuPos();  				  //位置pid计算
 	TD_Calculate(&td2, motorPitch.posCtrl.output);
-	motorPitch.veloCtrl.refVel = td2.v1;  //速度参考值由跟踪微分器给出，来达到安排过渡过程的目的
-// 	motorPitch.veloCtrl.refVel = motorPitch.posCtrl.output;
-	Motor_VeloCtrl(&motorPitch.veloCtrl); //速度pid计算
+//	TD_Calculate(&td2_velo, motorPitch.veloCtrl.rawVel);
 	
+	ADRC_LESO(&eso1, motorPitch.veloCtrl.rawVel);
+	eso1.u = kp*(td2.v1 - eso1.z1) + kd*(td2.v2 - eso1.z2) - eso1.z3/eso1.b0;
+	motorPitch.veloCtrl.output = limit_float(eso1.u, -20000, 20000);
+	
+	
+	motorPitch.veloCtrl.refVel = td2.v1 + td2.v2*kd;  //速度参考值由跟踪微分器给出，来达到安排过渡过程的目的
+// 	motorPitch.veloCtrl.refVel = motorPitch.posCtrl.output;
+//	Motor_VeloCtrl(&motorPitch.veloCtrl); //速度pid计算
+//	motor_pitch_veloCtrl();
 	/*	0x207  bodan	*/
 	Motor_VeloCtrl(&motorBodan.veloCtrl); //速度pid计算
 	//卡弹反转  +逆时针  -顺时针
@@ -61,7 +78,7 @@ void Gimbal_Control(void)
 		}
 
 	/*	电机值输出	*/
-	CAN_CMD_GIMBAL(motorYaw.veloCtrl.output, motorPitch.veloCtrl.output, motorBodan.veloCtrl.output, 0);
+	CAN_CMD_GIMBAL(motorYaw.veloCtrl.output, motorPitch.veloCtrl.output + 1000, motorBodan.veloCtrl.output, 0);
 }
 
 
@@ -136,8 +153,6 @@ void motorYawCalcuPos(void)
 		//积分限幅
 		motorYaw.posCtrl.integ = limit_output(motorYaw.posCtrl.integ, -5000, 5000);
 		
-//		TD_Calculate(&td2, motorYaw.posCtrl.err);	
-//		diff = td2.v2;  //使用跟踪微分器输出微分值
 		diff = motorYaw.posCtrl.err - motorYaw.posCtrl.errLast;	//计算误差变化率
 				
 		// 绝对式方法计算PID输出 */ 	             //* abs(motorYaw.posCtrl.err) / 2
@@ -166,14 +181,15 @@ void motorPitchCalcuPos(void)
 		motorPitch.posCtrl.integ = limit_output(motorPitch.posCtrl.integ, -5000, 5000);
 					
 		diff = motorPitch.posCtrl.err - motorPitch.posCtrl.errLast;	//计算误差变化率
-				
+		ESO_AngularRate_run(&eso2, diff, 1.0f/200);
+		
 		// 绝对式方法计算PID输出                         // * abs(motorPitch.posCtrl.err)
 		motorPitch.posCtrl.output = motorPitch.posCtrl.kp * motorPitch.posCtrl.err + motorPitch.posCtrl.ki * motorPitch.posCtrl.integ + motorPitch.posCtrl.kd * diff;
 		
-		if(motorPitch.posCtrl.output > 100)
-		{
-			motorPitch.posCtrl.output += 200;
-		}
+//		if(motorPitch.posCtrl.output > 100)
+//		{
+//			motorPitch.posCtrl.output += 200;
+//		}
 //		/* 用固定加速度逼近终值， 0.8为积分裕量，用来削减积分值和实际值之间的偏差 */
 //		if (motorPitch.posCtrl.err < 0.0f)
 //			sign = -1.0f;
@@ -208,7 +224,8 @@ void Motor_VeloCtrl(VeloPidCtrl_t *vel_t)
 	//输出限幅 
 	vel_t->output = limit_output(vel_t->output, vel_t->outputMin, vel_t->outputMax);
 }
-static inline void MotorFliter_VeloCtrl(VeloPidCtrl_t *vel_t)
+
+static inline void MotorFliter_VeloCtrl(VeloPidCtrl_t *vel_t)  //速度反馈使用td滤波后的值
 {
 	float diff;
 	
@@ -225,6 +242,29 @@ static inline void MotorFliter_VeloCtrl(VeloPidCtrl_t *vel_t)
 	
 	//输出限幅 
 	vel_t->output = limit_output(vel_t->output, vel_t->outputMin, vel_t->outputMax);
+}
+
+static inline void motor_pitch_veloCtrl(void)
+{
+	float diff;
+	
+	// 速度PID 
+	motorPitch.veloCtrl.errLast = motorPitch.veloCtrl.err;
+	
+//	TD_Calculate(&td2_velo, motorPitch.veloCtrl.err);
+	TD_Calculate(&td2_velo, motorPitch.veloCtrl.rawVel);
+	
+	motorPitch.veloCtrl.err = motorPitch.veloCtrl.refVel - td2_velo.v1;//motorPitch.veloCtrl.rawVel;		//使用vel_t->refVel作为速度期望
+	diff = motorPitch.veloCtrl.err - motorPitch.veloCtrl.errLast;
+	motorPitch.veloCtrl.integ += motorPitch.veloCtrl.err;
+	
+	//积分限幅 
+	motorPitch.veloCtrl.integ = limit_output(motorPitch.veloCtrl.integ, -4000, 4000);
+		
+	motorPitch.veloCtrl.output = motorPitch.veloCtrl.kp * motorPitch.veloCtrl.err + motorPitch.veloCtrl.ki * motorPitch.veloCtrl.integ + motorPitch.veloCtrl.kd * (td2.v2 - td2_velo.v2);
+	
+	//输出限幅 
+	motorPitch.veloCtrl.output = limit_output(motorPitch.veloCtrl.output, motorPitch.veloCtrl.outputMin, motorPitch.veloCtrl.outputMax);
 }
 /**
   * @brief	串口调试电机控制参数

@@ -567,14 +567,19 @@
               <FilePath>..\APP\Referee\CRC.c</FilePath>
             </File>
             <File>
-              <FileName>HMW.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\APP\Inc\HMW.h</FilePath>
-            </File>
-            <File>
               <FileName>ESO.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\APP\ADRC\ESO.h</FilePath>
+            </File>
+            <File>
+              <FileName>TD4.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\APP\ADRC\TD4.h</FilePath>
+            </File>
+            <File>
+              <FileName>kalman_Filter.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\APP\ADRC\kalman_Filter.h</FilePath>
             </File>
           </Files>
         </Group>

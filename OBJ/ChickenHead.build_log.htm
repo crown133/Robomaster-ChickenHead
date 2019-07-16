@@ -22,12 +22,19 @@ Dialog DLL:      TCM.DLL V1.35.1.0
  
 <h2>Project:</h2>
 F:\RoboMasters\ChickenHead\Robomaster-ChickenHead\MDK-ARM\ChickenHead.uvprojx
-Project File Date:  07/06/2019
+Project File Date:  07/11/2019
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\MDK5\ARM\ARMCC\Bin'
 Build target 'ChickenHead'
-"..\OBJ\ChickenHead.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+..\APP\Src\main.c(131): warning:  #223-D: function "SendDatabuild" declared implicitly
+  		SendDatabuild();
+..\APP\Src\main.c: 1 warning, 0 errors
+linking...
+Program Size: Code=23312 RO-data=1612 RW-data=108 ZI-data=4452  
+FromELF: creating hex file...
+"..\OBJ\ChickenHead.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -50,7 +57,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.1
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

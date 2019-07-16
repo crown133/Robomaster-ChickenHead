@@ -15,7 +15,6 @@ float halAVelo[3], halBVelo[3];
 float shootVeloA[6] = {0}, shootVeloB[6] = {0};  //最后一位是平均值
 int countA = 0, countB = 0;    //均值滤波计数用
 
-VeloPidCtrl_t motorA, motorB;
 
 /********** 摩擦轮pid参数初始化 ********/
 void MocaWheelInit(VeloPidCtrl_t *motor, float p, float i, float d, float outmax, float outmin)

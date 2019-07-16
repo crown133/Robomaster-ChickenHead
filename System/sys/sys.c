@@ -101,7 +101,7 @@ void SysNVIC_SetPriority(void)
     HAL_NVIC_EnableIRQ(USART6_IRQn);
 	
     /* UART7 interrupt Init */
-    HAL_NVIC_SetPriority(UART7_IRQn, 2, 0);
+    HAL_NVIC_SetPriority(UART7_IRQn, 1, 4);
     HAL_NVIC_EnableIRQ(UART7_IRQn);
 	
 	/******** UART8 interrupt Init IMU*********/

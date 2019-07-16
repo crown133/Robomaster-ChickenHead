@@ -4,7 +4,6 @@
 #include "Can_Ctrl.h"
 #include "Pc_Uart.h"
 #include "Shoot_Ctrl.h"
-#include "HMW.h"
 
 #include "imu.h"
 
@@ -14,12 +13,17 @@
 
 #include "sys.h"
 
-
 #define Yaw_Limit(x, num)	( (x) < (num) ? (1) : (0) )
 
 float pitchPos;
 float yawPos;
 float BodanSpeed;
+
+float kf0 = 150, kf1 = 150;
+float sum = 0.008;
+
+kalman_filter_t yaw_kalman_filter, pitch_kalman_filter;
+kalman_filter_t yaw_velo_kf;
 
 extern void moto_angle_send(void);
 
@@ -34,8 +38,9 @@ void sysControl(void)
 		if(!initFlag)  //IMU反馈闭环模式
 		{
 			/************* Yaw Axis Pos Change ************/
-			TD_Calculate(&td1, motorYaw.veloCtrl.rawVel);
-			motorYaw.veloCtrl.filrawVel = td1.v1;  //速度参考值由跟踪微分器给出，来达到安排过渡过程的目的
+			TD_Calculate(&td1_velo, motorYaw.veloCtrl.rawVel);
+			motorYaw.veloCtrl.filrawVel =  td1_velo.v1;//yaw_velo_kf.filtered_value[0];
+
 //			motorYaw.veloCtrl.rawVel = JYgyro.gyroVeloz;  //
 			motorYaw.posCtrl.rawPosLast = motorYaw.posCtrl.rawPos;
 //			motorYaw.posCtrl.rawPos = JYgyro.gyroAnglez - motorYaw.posCtrl.posBias;
@@ -63,20 +68,39 @@ void sysControl(void)
 			
 			/************* Pitch Axis Pos Change ************/
 			motorPitch.posCtrl.rawPos = JYgyro.gyroAngley;
-			
+
 //			if((mouseR != 0) || (RemoteCtrlData.remote.s2 != 1))  //防止供弹链路内有子弹，云台俯仰压缩链路
 			pitchPos = CH1Radio * (RemoteCtrlData.remote.ch1 - 1024) - RemoteCtrlData.mouse.y*0.01;
 			
 			Motor_AbsPos(&(motorPitch.posCtrl), pitchPos, 20, -35);//电机在IMU模式下 遥控值限位
 			
 			/*************** 视觉辅助 *************/
-//			if(RemoteCtrlData.remote.s1 == 3)  //视觉辅助开关
-//			{
-////				motorYaw.posCtrl.motorBias = -yawInc;
-////				TD_Calculate(&tdYawPc, -yawInc);
-//				Motor_AbsPos(&(motorYaw.posCtrl), -yawInc/90, 360, -360);
-////				Motor_AbsPos(&(motorPitch.posCtrl), -pitchInc/120, 182, 145);
-//			}
+			if(RemoteCtrlData.remote.s1 == 2)  //视觉辅助开关
+			{				
+				TD_Calculate(&tdYawPc, yawInc);
+				TD_Calculate(&tdPitchPc, pitchInc);
+//				TD4_track4(&trackerYawInc, yawInc, 1.0f/200);
+//				ESO_AngularRate_run(&eso2, yawInc, 1.0f/200);
+//				eso2.z2 = 0;
+//				sum = (trackerYawInc.x1/kf0 + eso2.z2 * kf1) * 100; 
+//				ADRC_LESO(&eso1, yawInc);
+				kalman_filter_calc(&yaw_kalman_filter, yawInc, 0);
+				kalman_filter_calc(&pitch_kalman_filter, pitchInc, 0);
+				
+				Motor_AbsPos(&motorYaw.posCtrl, -yaw_kalman_filter.filtered_value[0]/150 - tdYawPc.v2 * 0.004, 360, -360);
+				Motor_AbsPos(&motorPitch.posCtrl, -pitch_kalman_filter.filtered_value[0]/150 - tdPitchPc.v2 * 0.005, 20, -35);
+				
+				kf0 = pitch_kalman_filter.filtered_value[0];   //角度
+				
+			}
+
+			if(RemoteCtrlData.remote.s1 == 3)
+			{
+				TD_Calculate(&tdPitchPc, pitchInc);
+				kalman_filter_calc(&pitch_kalman_filter, pitchInc, 0);
+				Motor_AbsPos(&motorPitch.posCtrl, -pitch_kalman_filter.filtered_value[0]/kf1 - tdPitchPc.v2 * sum, 20, -35);
+				kf0 = pitch_kalman_filter.filtered_value[0];   //角度
+			}
 	
 		}
 		else  //电机编码器闭环模式
@@ -115,6 +139,10 @@ void sysControl(void)
 		}
 		
 		Gimbal_Control();  //电机控制函数
+	}
+	else
+	{
+		CAN_CMD_GIMBAL(0, 0, 0, 0);
 	}
 	
 	//CtrlDebug(motorPitch.posCtrl.rawPos, motorPitch.posCtrl.output, td2.v1, td2.v2, 0, 0, 0, 0, 0, 0);  //发送调试信息到串口

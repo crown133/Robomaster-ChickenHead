@@ -16,14 +16,18 @@
 #include "Motor_Ctrl.h"
 #include "Shoot_Ctrl.h"
 #include "imu.h"
+
 #include "adrc.h"
-#include "ins.h"
+#include "kalman_filter.h"
+
 /*---------------------------------------------------------*/
 
 void SystemClock_Config(void);
 
 unsigned int initFlag = 1; //云台位置初始化
 unsigned int sendFlag = 0;
+extern kalman_filter_t yaw_kalman_filter, pitch_kalman_filter;
+extern kalman_filter_t yaw_velo_kf;
 
 int main(void)
 {
@@ -41,9 +45,9 @@ int main(void)
   MX_USART3_UART_Init();  //与裁判系统通信
 //  MX_USART6_UART_Init();  //俯仰轴电机
 //  data_head_init();	  //我方为红方，裁判系统初始化
-////  data_head_blue_init();//我方为蓝方，裁判系统初始化
+//  data_head_blue_init();//我方为蓝方，裁判系统初始化
 //  
-//MX_UART7_Init();        //与电脑串口通信
+  MX_UART7_Init();        //与电脑串口通信
   MX_UART8_Init();		  //JY901
 
   MX_TIM4_Init();		//PWM输出，驱动Snail电机 周期2ms
@@ -69,18 +73,49 @@ int main(void)
 		
   Motor_ValueSet(&motorYaw, 5, 0.1, 0, 20000, -20000, 2, \
 		0, 0.02, 600, -600, DISABLE);  //Yaw轴电机
-//  ADRC_Yaw_Init();
+  ADRC_Yaw_Init();
   
   Motor_ValueSet(&motorBodan, 6, 0, 0, 9000, -9000, 0, \
 		0, 0, 0, 0, DISABLE);  						 //拨蛋电机
   
 
-/********** Tracking Differentiator Init *************/
+/********** Various Filters Init *************/
   TD_Init(&td1, 150, 0.05, 0.005);
-  TD_Init(&td2, 150, 0.05, 0.005);
-  TD_Init(&tdYawPc, 300, 0.05, 0.005);
-  TD_Init(&tdPitchPc, 3000, 0.085, 0.005);
+  TD_Init(&td2, 300, 0.05, 2);
+  TD_Init(&td1_velo, 150, 0.05, 0.005);
+  TD_Init(&td2_velo, 150, 0.05, 0.005);
+  TD_Init(&tdYawPc, 100, 0.005, 0.005);
+  TD_Init(&tdPitchPc, 100, 0.005, 0.005);
   
+  LESO_Init(&eso1, 0.04, 15, 75, 125, 0.02);
+  TD4_init(&trackerYawInc, 15, 15, 15, 15);
+  TD4_init(&trackerPitchInc, 15, 15, 15, 15);
+  TD4_init(&trackerYaw, 15, 15, 15, 15);
+  TD4_init(&trackerPitch, 15, 15, 15, 15);
+  init_ESO_AngularRateYaw(&eso2, 0, 0, 0, 0.5f, 6);
+  
+  kalman_filter_init_t yaw_kalman_filter_para = {
+						  .P_data = {2, 0, 0, 2},
+						  .A_data = {1, 0.001, 0, 1},
+						  .H_data = {1, 0, 0, 1},
+						  .Q_data = {1, 0, 0, 1},
+						  .R_data = {1000, 0, 0, 0}
+						};
+  kalman_filter_init_t pitch_kalman_filter_para = {
+						  .P_data = {2, 0, 0, 2},
+						  .A_data = {1, 0.001, 0, 1},
+						  .H_data = {1, 0, 0, 1},
+						  .Q_data = {1, 0, 0, 1},
+						  .R_data = {8000, 0, 0, 0}
+						};
+  kalman_filter_init(&yaw_kalman_filter, &yaw_kalman_filter_para);
+  kalman_filter_init(&pitch_kalman_filter, &pitch_kalman_filter_para);
+  kalman_filter_init(&yaw_velo_kf, &pitch_kalman_filter_para);
+						
+/***********************************************/
+
+
+
   delay_ms(500);
   
   HAL_TIM_Base_Start_IT(&htim3);  //开启中断
@@ -104,14 +139,14 @@ int main(void)
 		  motorYaw.posCtrl.relaPos = JYgyro.gyroAnglez;
 		  motorYaw.posCtrl.refPos  = JYgyro.gyroAnglez;
 		
-		  Motor_ValueSet(&motorYaw, 116, 0.02, 0, 20000, -20000, -3.6, \
-						0, -1, 800, -800, DISABLE); 
+		  Motor_ValueSet(&motorYaw, 130, 0.03, 5, 20000, -20000, -3.6, \
+						0, -10, 800, -800, DISABLE);
 		  
 		  motorPitch.posCtrl.refPos  = JYgyro.gyroAngley;
 		  motorPitch.posCtrl.relaPos = JYgyro.gyroAngley;
 		  motorPitch.posCtrl.rawPos  = JYgyro.gyroAngley;
 		  
-		  Motor_ValueSet(&motorPitch, 120, 0.02, 10, 20000, -20000, 3, \
+		  Motor_ValueSet(&motorPitch, 80, 0, 50, 20000, -20000, 55, \
 						0, 0, 800, -800, DISABLE);  				 //Pitch轴电机
 	  }
 	  

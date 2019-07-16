@@ -37,3 +37,6 @@
 ..\obj\adrc.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 ..\obj\adrc.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\adrc.o: ..\APP\Inc\Motor_Ctrl.h
+..\obj\adrc.o: ..\APP\ADRC\TD4.h
+..\obj\adrc.o: ..\APP\ADRC\ESO.h
+..\obj\adrc.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdbool.h

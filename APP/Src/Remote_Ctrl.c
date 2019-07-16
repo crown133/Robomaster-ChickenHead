@@ -141,10 +141,10 @@ void RemoteCtl_Data_Receive(void)
 			RemoteCtrlFlag = 1; //接收到数据
 			RC_DataHandle(USART1_DMA_RX_BUF);                                        //进入数据解码函数
 		}
-//		else
-//		{
-//			RemoteCtrlFlag = 0;
-//		}
+		else
+		{
+			RemoteCtrlFlag = 0;
+		}
 	}
 }
 

@@ -36,6 +36,10 @@
 ..\obj\shoot_ctrl.o: ..\APP\Inc\Motor_Ctrl.h
 ..\obj\shoot_ctrl.o: ..\APP\ADRC\adrc.h
 ..\obj\shoot_ctrl.o: ..\System\sys\sys.h
+..\obj\shoot_ctrl.o: ..\APP\ADRC\TD4.h
+..\obj\shoot_ctrl.o: ..\APP\ADRC\ESO.h
+..\obj\shoot_ctrl.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdbool.h
+..\obj\shoot_ctrl.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\shoot_ctrl.o: ..\APP\Inc\Remote_Ctrl.h
 ..\obj\shoot_ctrl.o: ..\APP\Inc\tim.h
 ..\obj\shoot_ctrl.o: ..\System\delay\delay.h

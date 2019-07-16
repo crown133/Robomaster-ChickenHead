@@ -17,7 +17,6 @@ void MocaWheelInit(VeloPidCtrl_t *motor, float p, float i, float d, float outmax
 
 extern int setVelo;
 extern int mouseR, mouseFlag;
-extern VeloPidCtrl_t motorA, motorB;
 extern float shootVeloA[6], shootVeloB[6];  //最后一位是平均值
 
 #endif

@@ -1,9 +1,11 @@
 #ifndef _MOTOR_CTRL_H_
 #define _MOTOR_CTRL_H_
 
-#include "main.h"
+#include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #include "adrc.h"
+#include "TD4.h"
+#include "ESO.h"
 
 /* CAN通讯ID */
 #define FIRST_FOUR_ID		0x200
@@ -95,8 +97,15 @@ extern void CtrlDebug(float data1, float data2, float data3, float data4,
 
 /************************************/
 extern ADRC_Data ADRC_Yaw;  //Yaw 电机ADRC控制体
-extern TD td1, td2;
+extern TD td1, td2, td1_velo, td2_velo;
 extern TD tdYawPc, tdPitchPc;
+
+extern float kp, kd;
+
+extern ESO eso1;
+extern ESO_AngularRate eso2;
+
+extern TD4 trackerYawInc, trackerPitchInc, trackerYaw, trackerPitch;
 
 extern void Gimbal_Control(void);
 

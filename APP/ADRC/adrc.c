@@ -132,8 +132,8 @@ void TD_Calculate(TD *td, float expert)
 //Yaw电机adrc参数初始化
 void ADRC_Yaw_Init(void)
 {
-	ADRC_Yaw.r0 = 3000;  //响应速度
-	ADRC_Yaw.td_h = 0.01; //滤波
+	ADRC_Yaw.r0 = 150;  //响应速度
+	ADRC_Yaw.td_h = 0.05; //滤波
 	ADRC_Yaw.h0 = 0.001;  //跟踪速度
 	
 /************ ESO ***************/
@@ -209,19 +209,20 @@ static void ADRC_ESO_3N(ADRC_Data *adrc)
 	adrc->fe1 = fal(adrc->e, adrc->a2, adrc->alpha2);
 	
 	/*********** 状态量更新 ***********/
-	adrc->z1 += adrc->eso_h*(adrc->z2 - adrc->beta_01*adrc->e);
-	adrc->z2 += adrc->eso_h*(adrc->z3 - adrc->beta_02*adrc->fe + adrc->u*adrc->b0);
 	adrc->z3 += adrc->eso_h*(-adrc->beta_03*adrc->fe1);//ESO估计状态加速度信号，进行扰动补偿
+	adrc->z2 += adrc->eso_h*(adrc->z3 - adrc->beta_02*adrc->fe + adrc->u*adrc->b0);
+	adrc->z1 += adrc->eso_h*(adrc->z2 - adrc->beta_01*adrc->e);
+
 }
-//inline void LESO_Init(ESO* eso,)
-//{
-//	eso->b0 = 
-//	eso->beta_01 = ;
-//	eso->beta_02 = ;
-//	eso->beta_03 = ;
-//	eso->h = ;
-//	eso->z1 = eso->z2 = eso->z3 = 0;
-//}
+inline void LESO_Init(ESO* eso, float b0, float beta01, float beta02, float beta03, float h)
+{
+	eso->b0 = b0;
+	eso->beta_01 = beta01;
+	eso->beta_02 = beta02;
+	eso->beta_03 = beta03;
+	eso->h = h;
+	eso->z1 = eso->z2 = eso->z3 = 0;
+}
 
 inline void ADRC_LESO(ESO* eso, float y)
 {

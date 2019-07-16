@@ -104,6 +104,7 @@ extern void ADRC_Control(ADRC_Data *adrc, float adrc_expert, float adrc_feedback
 
 extern void TD_Init(TD *td, float r, float h, float n0);
 extern void TD_Calculate(TD *td, float expert);
-
+extern void LESO_Init(ESO* eso, float b0, float beta01, float beta02, float beta03, float h);
+extern inline void ADRC_LESO(ESO* eso, float y);
 #endif
 

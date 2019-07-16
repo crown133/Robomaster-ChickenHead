@@ -38,3 +38,7 @@
 ..\obj\can_ctrl.o: ..\APP\Inc\Motor_Ctrl.h
 ..\obj\can_ctrl.o: ..\APP\ADRC\adrc.h
 ..\obj\can_ctrl.o: ..\System\sys\sys.h
+..\obj\can_ctrl.o: ..\APP\ADRC\TD4.h
+..\obj\can_ctrl.o: ..\APP\ADRC\ESO.h
+..\obj\can_ctrl.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdbool.h
+..\obj\can_ctrl.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h
