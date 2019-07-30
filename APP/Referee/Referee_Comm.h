@@ -3,8 +3,8 @@
 
 #include "stm32f4xx_hal.h"
 
-#define BSP_USART3_DMA_RX_BUF_LEN 128u
-#define BSP_USART3_DMA_TX_BUF_LEN 30u
+#define BSP_USART6_DMA_RX_BUF_LEN 128u
+#define BSP_USART6_DMA_TX_BUF_LEN 80u
 
 #define FRAME_HEADER_LEN	sizeof(FrameHeader_t)
 #define CMD_ID_LEN					2u	//命令码长度
@@ -161,6 +161,26 @@ typedef __packed struct
 	uint8_t mask;				//自定义数据4
 }client_custom_data_t;			//客户端自定义数据
 
+
+typedef __packed struct
+{
+	uint8_t operate_tpye;
+	uint8_t graphic_tpye;
+	uint8_t graphic_name[5];
+	uint8_t layer;
+	uint8_t color;
+	uint8_t width;
+	uint16_t start_x;
+	uint16_t start_y;
+	uint16_t radius;
+	uint16_t end_x;
+	uint16_t end_y;
+	int16_t start_angle;
+	int16_t end_angle;
+	uint8_t text_lenght;
+	uint8_t text[30];
+} ext_client_graphic_draw_t;
+
 typedef __packed struct
 { 
 	FrameHeader_t                          frame_header;
@@ -178,6 +198,15 @@ typedef __packed struct
 	uint8_t								   attack_flag;
 	uint16_t                               CRC16;
 }send_data_guard;		           //发送的数据
+
+typedef __packed struct
+{ 
+	FrameHeader_t                          frame_header;
+	uint16_t                               cmd_id;
+	ext_student_interactive_header_data_t  client_header;
+	ext_client_graphic_draw_t			   graphic;
+	uint16_t                               CRC16;
+}send_data_graphic;		           //图形绘制
 
 typedef __packed volatile struct
 {
@@ -209,8 +238,9 @@ typedef __packed volatile struct
 	
 }ext_referee_data_t;
 
-extern uint8_t USART3_DMA_RX_BUF[BSP_USART3_DMA_RX_BUF_LEN];
-extern uint8_t USART3_DMA_TX_BUF[28];
+
+extern uint8_t USART6_DMA_RX_BUF[BSP_USART6_DMA_RX_BUF_LEN];
+extern uint8_t USART6_DMA_TX_BUF[BSP_USART6_DMA_TX_BUF_LEN];  //
 
 extern ext_referee_data_t RefereeData_t;
 
@@ -219,6 +249,8 @@ extern send_data_guard send_guard;
 
 extern void data_head_init(void);
 extern void data_head_blue_init(void);
+extern void graphic_draw(uint8_t name,  uint8_t operate_tpye, uint16_t x, uint16_t y, uint8_t r);
+
 extern void SendDatabuild(void);
 extern void Referee_Decode(uint8_t *pData);
 

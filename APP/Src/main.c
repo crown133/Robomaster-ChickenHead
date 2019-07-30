@@ -9,7 +9,7 @@
 #include "Pc_Uart.h"
 #include "Remote_Ctrl.h"
 #include "Referee_Comm.h"
-
+#include "Control_Loop.h"
 #include "sys.h"
 #include "delay.h"
 
@@ -25,11 +25,21 @@
 void SystemClock_Config(void);
 
 unsigned int initFlag = 1; //云台位置初始化
-unsigned int sendFlag = 0;
+unsigned int sendFlag0 = 0;
+extern unsigned int sendFlag1;
 extern kalman_filter_t yaw_kalman_filter, pitch_kalman_filter;
 extern kalman_filter_t yaw_velo_kf;
 
+extern uint8_t USART6_DMA_TX_BUF[80u];  //
+
+
+extern void graphic_draw(uint8_t name,  uint8_t operate_tpye, uint16_t x, uint16_t y, uint8_t r);
+
+
+extern void SendDatabuild(void); 
+
 int main(void)
+
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
@@ -42,9 +52,9 @@ int main(void)
   MX_DMA_Init();
   MX_CAN1_Init();
   MX_USART1_UART_Init();  //DBus
-  MX_USART3_UART_Init();  //与裁判系统通信
-//  MX_USART6_UART_Init();  //俯仰轴电机
-//  data_head_init();	  //我方为红方，裁判系统初始化
+//  MX_USART3_UART_Init();  
+  MX_USART6_UART_Init();  //与裁判系统通信
+  data_head_init();	  //我方为红方，裁判系统初始化
 //  data_head_blue_init();//我方为蓝方，裁判系统初始化
 //  
   MX_UART7_Init();        //与电脑串口通信
@@ -64,11 +74,11 @@ int main(void)
   
   /*********** Motor init position ***********/
   Motor_IncPos(&(motorPitch.posCtrl), 2700, 5000, 2000); //初始位置等于上电位置
-  Motor_IncPos(&(motorYaw.posCtrl), 4865, 6000, 3400); 
+  Motor_IncPos(&(motorYaw.posCtrl), 2200, 6000, 2000); 
   
   /********** motor control value set **********/  
   
-  Motor_ValueSet(&motorPitch, 6, 0.05, 20, 20000, -20000, 2, \
+  Motor_ValueSet(&motorPitch, 6, 0.05, 20, 20000, -20000, 3, \
 		0.01, 20, 900, -900, DISABLE);  				 //Pitch轴电机
 		
   Motor_ValueSet(&motorYaw, 5, 0.1, 0, 20000, -20000, 2, \
@@ -80,14 +90,15 @@ int main(void)
   
 
 /********** Various Filters Init *************/
-  TD_Init(&td1, 150, 0.05, 0.005);
-  TD_Init(&td2, 300, 0.05, 2);
+  TD_Init(&td1, 800, 0.06, 10);
+  TD_Init(&td2, 500, 0.05, 2);
   TD_Init(&td1_velo, 150, 0.05, 0.005);
-  TD_Init(&td2_velo, 150, 0.05, 0.005);
+  TD_Init(&td2_pos, 150, 0.05, 0.005);
+  TD_Init(&td2_velo, 1500, 0.005, 15);
   TD_Init(&tdYawPc, 100, 0.005, 0.005);
   TD_Init(&tdPitchPc, 100, 0.005, 0.005);
   
-  LESO_Init(&eso1, 0.04, 15, 75, 125, 0.02);
+  LESO_Init(&eso1, 0.035, 15, 75, 125, 0.015);
   TD4_init(&trackerYawInc, 15, 15, 15, 15);
   TD4_init(&trackerPitchInc, 15, 15, 15, 15);
   TD4_init(&trackerYaw, 15, 15, 15, 15);
@@ -114,42 +125,60 @@ int main(void)
 						
 /***********************************************/
 
-
-
   delay_ms(500);
   
   HAL_TIM_Base_Start_IT(&htim3);  //开启中断
   
   delay_ms(500);
   
+//  graphic_draw(1, 20);		//圆形绘制
+//  graphic_draw(2, 50);						
+						
   while (1)
   {
-	  sendFlag++;
-	  if(sendFlag == 1000000)  //裁判系统通讯
+	  sendFlag0++;
+	  if(sendFlag0 == 1000000)  //裁判系统通讯
 	  {
-		sendFlag = 0;
+		sendFlag0 = 0;
 		SendDatabuild();
-		HAL_UART_Transmit(&huart3, USART3_DMA_TX_BUF, 28, 10);
+		HAL_UART_Transmit(&huart6, USART6_DMA_TX_BUF, 28, 10);
+		
 	  }
-	  if((abs(motorYaw.posCtrl.rawPos - motorYaw.posCtrl.refPos) < 100) && (abs(motorPitch.posCtrl.rawPos - motorPitch.posCtrl.refPos) < 100) && initFlag) //电机模式切换
+//	  if(sendFlag0 >= 2000000)  //裁判系统通讯
+//	  {
+//		 sendFlag0 = 0;
+
+//		if(sendFlag1 == 0)
+//		{
+//			graphic_draw(2, 6, kpv, kiv, kdv);
+//		}
+//		
+//		sendFlag1 ++;
+//		
+//		if(sendFlag1 == 2)
+//		{
+//			graphic_draw(2, 1, kpv, kiv, kdv);	
+//		}
+//	  }
+	  if((abs(motorYaw.posCtrl.rawPos - motorYaw.posCtrl.refPos) < 100) && (abs(motorPitch.posCtrl.rawPos - motorPitch.posCtrl.refPos) < 150) && initFlag) //电机模式切换
   	  {
 		  initFlag = 0;
-//		  motorYaw.posCtrl.posBias = JYgyro.gyroAnglez - 180;
-		  motorYaw.posCtrl.rawPos  = JYgyro.gyroAnglez;
-		  motorYaw.posCtrl.relaPos = JYgyro.gyroAnglez;
-		  motorYaw.posCtrl.refPos  = JYgyro.gyroAnglez;
+		  motorYaw.posCtrl.posBias = JYgyro.gyroAnglez;
+		  motorYaw.posCtrl.rawPos  = 0;
+		  motorYaw.posCtrl.relaPos = 0;
+		  motorYaw.posCtrl.refPos  = 0;
 		
-		  Motor_ValueSet(&motorYaw, 130, 0.03, 5, 20000, -20000, -3.6, \
-						0, -10, 800, -800, DISABLE);
+		  Motor_ValueSet(&motorYaw, 100, 0.01, 100, 20000, -20000, -3, \
+						0, -100, 800, -800, DISABLE);
 		  
 		  motorPitch.posCtrl.refPos  = JYgyro.gyroAngley;
 		  motorPitch.posCtrl.relaPos = JYgyro.gyroAngley;
 		  motorPitch.posCtrl.rawPos  = JYgyro.gyroAngley;
 		  
-		  Motor_ValueSet(&motorPitch, 80, 0, 50, 20000, -20000, 55, \
-						0, 0, 800, -800, DISABLE);  				 //Pitch轴电机
+		  Motor_ValueSet(&motorPitch, 40, 0, 35, 20000, -20000, 35, \
+						0, 100, 800, -800, DISABLE);  				 //Pitch轴电机
 	  }
-	  
+
 	  ShootWheel_Control();  //摩擦轮设置
   }
   

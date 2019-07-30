@@ -8,7 +8,7 @@
 #define limit_output(x, min, max)	( (x) <= (min) ? (min) : (x) >= (max) ? (max) : (x) )//限幅函数
 
 /**********************************************/
-TD td1, td2, td1_velo, td2_velo;; 		  //速度环参考值使用跟踪微分器安排过渡过程
+TD td1, td2, td1_velo, td2_pos, td2_velo;; 		  //速度环参考值使用跟踪微分器安排过渡过程
 TD tdYawPc, tdPitchPc;//速度反馈值使用跟踪微分器进行微分
 ESO eso1;
 ESO_AngularRate eso2;
@@ -52,22 +52,20 @@ void Gimbal_Control(void)
 	
 	/*  pitch	*/
 	motorPitchCalcuPos();  				  //位置pid计算
-	TD_Calculate(&td2, motorPitch.posCtrl.output);
-//	TD_Calculate(&td2_velo, motorPitch.veloCtrl.rawVel);
+	TD_Calculate(&td2, motorPitch.posCtrl.output);	
+//	ADRC_LESO(&eso1, motorPitch.veloCtrl.rawVel);
+//	eso1.u = kp*(td2.v1 - eso1.z1) + kd*(td2.v2 - eso1.z2) - eso1.z3/eso1.b0;
+//	motorPitch.veloCtrl.output = limit_float(eso1.u, -20000, 20000);
 	
-	ADRC_LESO(&eso1, motorPitch.veloCtrl.rawVel);
-	eso1.u = kp*(td2.v1 - eso1.z1) + kd*(td2.v2 - eso1.z2) - eso1.z3/eso1.b0;
-	motorPitch.veloCtrl.output = limit_float(eso1.u, -20000, 20000);
-	
-	
-	motorPitch.veloCtrl.refVel = td2.v1 + td2.v2*kd;  //速度参考值由跟踪微分器给出，来达到安排过渡过程的目的
-// 	motorPitch.veloCtrl.refVel = motorPitch.posCtrl.output;
+//	motorPitch.veloCtrl.refVel = td2.v1;  //速度参考值由跟踪微分器给出，来达到安排过渡过程的目的
+ 	motorPitch.veloCtrl.refVel = motorPitch.posCtrl.output;
 //	Motor_VeloCtrl(&motorPitch.veloCtrl); //速度pid计算
-//	motor_pitch_veloCtrl();
+	motor_pitch_veloCtrl();
+	
 	/*	0x207  bodan	*/
 	Motor_VeloCtrl(&motorBodan.veloCtrl); //速度pid计算
 	//卡弹反转  +逆时针  -顺时针
-	if(((motorBodan.veloCtrl.output >= 8000) || (motorBodan.veloCtrl.output <= -8000)) && (motorBodan.veloCtrl.rawVel == 0)) //卡弹反转
+	if(((motorBodan.veloCtrl.output >= 9000) || (motorBodan.veloCtrl.output <= -9000)) && (motorBodan.veloCtrl.rawVel == 0)) //卡弹反转
 		{
 			bodanCwCcwFlag = 0;
 		}
@@ -151,7 +149,7 @@ void motorYawCalcuPos(void)
 		motorYaw.posCtrl.integ += motorYaw.posCtrl.err;
 		
 		//积分限幅
-		motorYaw.posCtrl.integ = limit_output(motorYaw.posCtrl.integ, -5000, 5000);
+		motorYaw.posCtrl.integ = limit_output(motorYaw.posCtrl.integ, -1000, 1000);
 		
 		diff = motorYaw.posCtrl.err - motorYaw.posCtrl.errLast;	//计算误差变化率
 				
@@ -178,10 +176,10 @@ void motorPitchCalcuPos(void)
 		motorPitch.posCtrl.integ += motorPitch.posCtrl.err;
 		
 		//积分限幅
-		motorPitch.posCtrl.integ = limit_output(motorPitch.posCtrl.integ, -5000, 5000);
+		motorPitch.posCtrl.integ = limit_output(motorPitch.posCtrl.integ, -1000, 1000);
 					
 		diff = motorPitch.posCtrl.err - motorPitch.posCtrl.errLast;	//计算误差变化率
-		ESO_AngularRate_run(&eso2, diff, 1.0f/200);
+//		ESO_AngularRate_run(&eso2, diff, 1.0f/200);
 		
 		// 绝对式方法计算PID输出                         // * abs(motorPitch.posCtrl.err)
 		motorPitch.posCtrl.output = motorPitch.posCtrl.kp * motorPitch.posCtrl.err + motorPitch.posCtrl.ki * motorPitch.posCtrl.integ + motorPitch.posCtrl.kd * diff;

@@ -92,15 +92,15 @@ void SysNVIC_SetPriority(void)
     HAL_NVIC_SetPriority(USART1_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 	
-	/******** USART3 interrupt Init ********/  //裁判系统
-    HAL_NVIC_SetPriority(USART3_IRQn, 2, 1);
-    HAL_NVIC_EnableIRQ(USART3_IRQn);
+	/******** USART3 interrupt Init ********/  //
+//    HAL_NVIC_SetPriority(USART3_IRQn, 2, 1);
+//    HAL_NVIC_EnableIRQ(USART3_IRQn);
 	
-	/******** USART6 interrupt Init ********/  //HMW电机
-    HAL_NVIC_SetPriority(USART6_IRQn, 1, 3);
+	/******** USART6 interrupt Init ********/  //裁判系统
+    HAL_NVIC_SetPriority(USART6_IRQn, 1, 7);
     HAL_NVIC_EnableIRQ(USART6_IRQn);
 	
-    /* UART7 interrupt Init */
+    /******** UART7 interrupt Init *********/
     HAL_NVIC_SetPriority(UART7_IRQn, 1, 4);
     HAL_NVIC_EnableIRQ(UART7_IRQn);
 	
@@ -131,11 +131,11 @@ void SysNVIC_SetPriority(void)
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
   
   /* DMA2_Stream1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 2, 1); //串口6 HMW电机接收
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 2, 1); //串口6 接收
   HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 	
   /* DMA2_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 1, 8); //串口6 HMW电机发送
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 1, 8); //串口6 发送
   HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 
   /* DMA2_Stream2_IRQn interrupt configuration */

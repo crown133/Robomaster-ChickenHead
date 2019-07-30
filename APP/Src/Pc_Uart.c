@@ -4,7 +4,7 @@
 
 
 uint8_t UART7_DMA_RX_BUF[UART7_DMA_RX_BUF_LEN];
-uint8_t UART7_TX_BUF[3] = {0xA5, 0x5A, 0};
+uint8_t UART7_TX_BUF[3] = {0xA5, 0x5A, 1};
 uint32_t rxLength;
 
 float yawInc, pitchInc;

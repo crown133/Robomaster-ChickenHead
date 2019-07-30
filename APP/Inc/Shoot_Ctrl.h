@@ -15,7 +15,7 @@ void ShootWheel_Control(void);
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 void MocaWheelInit(VeloPidCtrl_t *motor, float p, float i, float d, float outmax, float outmin);
 
-extern int setVelo;
+extern uint16_t setVelo;
 extern int mouseR, mouseFlag;
 extern float shootVeloA[6], shootVeloB[6];  //最后一位是平均值
 

@@ -16,7 +16,6 @@
 #include "ins.h"
 #include "Pc_Uart.h"
 #include "Referee_Comm.h"
-#include "HMW.H"
 
 #include "mpu6500driver_middleware.h"
 /* USER CODE END 0 */
@@ -151,15 +150,14 @@ void USART1_IRQHandler(void)
 /***** USART3 interrupt *****/
 void USART3_IRQHandler(void)
 {
-  Referee_Decode(USART3_DMA_RX_BUF);
-  HAL_UART_IRQHandler(&huart3);
-	
+  HAL_UART_IRQHandler(&huart3); 
+
 }
 
 /***** USART6 interrupt *****/
 void USART6_IRQHandler(void)
 {
-  get_moto_Practical_angle();
+//  Referee_Decode(USART6_DMA_RX_BUF);
 //  HAL_UART_IRQHandler(&huart6);
 }
 

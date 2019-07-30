@@ -8,7 +8,8 @@
 #define BeThree(x) ((x)>2 ? 0:(x))  //Êó±êÓÒ¼üÄ¦²ÁÂÖ»»µ²
 int mouseR = 0, mouseFlag = 0;
 
-int setVelo;
+uint16_t setVelo = 1000;
+
 
 float halAVelo[3], halBVelo[3];
 
@@ -71,30 +72,59 @@ void ShootWheel_Control(void)
 //		fireFlag = 0;
 //	}
 
-	if(RemoteCtrlData.mouse.press_r == 1) //Êó±êÓÒ¼üÄ¦²ÁÂÖ»»µ²
-	{
-		mouseR++;
-		mouseR = BeThree(mouseR);
-		RemoteCtrlData.mouse.press_r = 0;
+//	if(RemoteCtrlData.mouse.press_r == 1) //Êó±êÓÒ¼üÄ¦²ÁÂÖ»»µ²
+//	{
+//		mouseR++;
+//		mouseR = BeThree(mouseR);
+//		RemoteCtrlData.mouse.press_r = 0;
+//	}
+
+	{  //µçÄÔQ W EÇÐ»»Ä¦²ÁÂÖ×ªËÙ
+		if(RemoteCtrlData.key.Q == 1)
+		{
+			mouseR = 0;
+		}
+		if(RemoteCtrlData.key.W == 1)
+		{
+			mouseR = 1;
+		}
+		if(RemoteCtrlData.key.E == 1)
+		{
+			mouseR = 2;
+		}
 	}
 
-	
-	if((RemoteCtrlData.remote.s2 == FireFire) || (mouseR == 2))
+	if(((RemoteCtrlData.remote.s2 == FireFire) || (mouseR == 2)))// && (setVelo >= 1245))
 	{
-		if(setVelo < 1300)
+		if(setVelo < 1400 )// && (velo_delay1 == 0)) 
 		{
 			setVelo += 1;
+			delay_ms(1);
 		}
+		
+//		velo_delay1++;
+//		
+//		if(velo_delay1 > velo_delay0)
+//		{
+//			velo_delay1 = 0;
+//		}
+		
 		PGout(13) = 1;
 		
 	}
 	else if(RemoteCtrlData.remote.s2 == FireWeak || (mouseR == 1))
 	{
-		if(setVelo < 1250)
+		if(setVelo < 1250)// && (velo_delay1 == 0))
 		{
 			setVelo += 1;
-			HAL_Delay(1);
+			delay_ms(1);
 		}
+//		velo_delay1++;
+//		
+//		if(velo_delay1 > velo_delay0)
+//		{
+//			velo_delay1 = 0;
+//		}
 		if(setVelo > 1250)
 		{
 			setVelo -= 10;
@@ -104,7 +134,7 @@ void ShootWheel_Control(void)
 	else
 	{
 		setVelo = 1000;
-		PGout(13) = 0;
+		PGout(13) = 1;
 	}
 		MocaWheelA = setVelo;
 		MocaWheelB = setVelo;

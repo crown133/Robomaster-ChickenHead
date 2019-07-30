@@ -45,3 +45,4 @@
 ..\obj\referee_comm.o: D:\MDK5\ARM\ARMCC\Bin\..\include\stdbool.h
 ..\obj\referee_comm.o: D:\MDK5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\referee_comm.o: ..\APP\Inc\Remote_Ctrl.h
+..\obj\referee_comm.o: ..\APP\Inc\Pc_Uart.h

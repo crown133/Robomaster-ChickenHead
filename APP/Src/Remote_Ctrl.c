@@ -8,8 +8,13 @@ uint8_t USART1_DMA_RX_BUF[BSP_USART1_DMA_RX_BUF_LEN];  //定义一个数组用于存放从D
 
 RemoteCtrl_t RemoteCtrlData;       //遥控器输入
 int8_t RemoteCtrlFlag = 0;			//遥控器接收标志位
-uint8_t mouseRFlag1 = 0, mouseRFlag2 = 0, ReceiveTimes = 0;
+uint8_t mouseRFlag1 = 0, mouseRFlag2 = 0, ReceiveTimes = 0;  //
 uint8_t mouseRFlag3 = 0, mouseRFlag4 = 0;
+uint8_t mouseRFlag5 = 0, mouseRFlag6 = 0;
+uint8_t mouseRFlag7 = 0, mouseRFlag8 = 0;
+uint8_t mouseRFlag01 = 0, mouseRFlag02 = 0;
+uint8_t mouseRFlag03 = 0, mouseRFlag04 = 0;
+uint8_t mouseRFlag05 = 0, mouseRFlag06 = 0;
 
 /**
   * @brief	根据遥控器协议对进行接收到的数据进行处理
@@ -77,23 +82,115 @@ void RC_DataHandle(uint8_t *pData)
 	}
 	
 	/* pData[14],pData[15]为键盘值 */
-//	if(!mouseRFlag3)
-//	{
-		RemoteCtrlData.key.shift = (int16_t)((pData[14] >> 4) & 0x01);
-		
-//		if(RemoteCtrlData.key.shift == 1)
-//		mouseRFlag3++;
-//	}
-//	if(mouseRFlag3)
-//	{
-//		mouseRFlag4++;
-//	}
-//	if(mouseRFlag4 > 50)
-//	{
-//		mouseRFlag3 = 0;
-//		mouseRFlag4 = 0;
-//	}
-	RemoteCtrlData.key.v = (int16_t)(pData[14] | pData[15] << 8); 
+	{
+		if(!mouseRFlag3)
+		{
+			RemoteCtrlData.key.shift = (int16_t)((pData[14] >> 4) & 0x01);
+ 			
+			if(RemoteCtrlData.key.shift == 1)
+			mouseRFlag3++;
+		}
+
+		if(mouseRFlag3)
+		{
+			mouseRFlag4++;
+		}
+		if(mouseRFlag4 > 50)
+		{
+			mouseRFlag3 = 0;
+			mouseRFlag4 = 0;
+		}
+	}
+	
+	{
+		if(!mouseRFlag5)
+		{
+			RemoteCtrlData.key.S = (int16_t)((pData[14] >> 1) & 0x01);	
+			if(RemoteCtrlData.key.S == 1)
+			mouseRFlag5++;
+		}
+		if(mouseRFlag5)
+		{
+			mouseRFlag6++;
+		}
+		if(mouseRFlag6 > 30)
+		{
+			mouseRFlag5 = 0;
+			mouseRFlag6 = 0;
+		}
+	}
+	
+	{
+		if(!mouseRFlag7)
+		{
+			RemoteCtrlData.key.A = (int16_t)((pData[14] >> 2) & 0x01);	
+			if(RemoteCtrlData.key.A == 1)
+			mouseRFlag7++;
+		}
+		if(mouseRFlag7)
+		{
+			mouseRFlag8++;
+		}
+		if(mouseRFlag8 > 30)
+		{
+			mouseRFlag7 = 0;
+			mouseRFlag8 = 0;
+		}
+	}
+
+	{
+		if(!mouseRFlag01)
+		{
+			RemoteCtrlData.key.Q = (int16_t)((pData[14] >> 6) & 0x01);	
+			if(RemoteCtrlData.key.Q == 1)
+			mouseRFlag01++;
+		}
+		if(mouseRFlag01)
+		{
+			mouseRFlag02++;
+		}
+		if(mouseRFlag02 > 30)
+		{
+			mouseRFlag01 = 0;
+			mouseRFlag02 = 0;
+		}
+	}
+	
+	{
+		if(!mouseRFlag03)
+		{
+			RemoteCtrlData.key.W = (int16_t)((pData[14]) & 0x01);	
+			if(RemoteCtrlData.key.W == 1)
+			mouseRFlag03++;
+		}
+		if(mouseRFlag03)
+		{
+			mouseRFlag04++;
+		}
+		if(mouseRFlag04 > 30)
+		{
+			mouseRFlag03 = 0;
+			mouseRFlag04 = 0;
+		}
+	}
+	
+	{
+		if(!mouseRFlag05)
+		{
+			RemoteCtrlData.key.E = (int16_t)((pData[14] >> 7) & 0x01);	
+			if(RemoteCtrlData.key.E == 1)
+			mouseRFlag05++;
+		}
+		if(mouseRFlag05)
+		{
+			mouseRFlag06++;
+		}
+		if(mouseRFlag06 > 30)
+		{
+			mouseRFlag05 = 0;
+			mouseRFlag06 = 0;
+		}
+	}	
 //	RemoteCtrlData.key.shift = (int16_t)((pData[14] >> 4) & 0x01);
 //		  if(RemoteCtrlData.key.shift == 1)
 //	  {

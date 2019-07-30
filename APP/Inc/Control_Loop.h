@@ -11,7 +11,9 @@
 extern void sysControl(void);
 extern kalman_filter_t yaw_kalman_filter, pitch_kalman_filter;
 extern kalman_filter_t yaw_velo_kf;
-extern float kf0, kf1;
-extern float sum;
+extern float kf0, kf1, kf2, kf3;
+extern float kpv, kiv, kdv, kpp, kip, kdp;
+extern float sum, sum1;
+extern unsigned int sendFlag1;
 
 #endif

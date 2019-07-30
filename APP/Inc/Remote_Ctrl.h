@@ -41,7 +41,11 @@ typedef struct
 	
 	struct
 	{
-		uint16_t v;//¼üÅÌ
+		uint8_t A;//¼üÅÌ
+		uint8_t S;
+		uint8_t Q;
+		uint8_t W;
+		uint8_t E;
 		uint8_t shift;
 	} key;
 	

@@ -97,7 +97,7 @@ extern void CtrlDebug(float data1, float data2, float data3, float data4,
 
 /************************************/
 extern ADRC_Data ADRC_Yaw;  //Yaw 电机ADRC控制体
-extern TD td1, td2, td1_velo, td2_velo;
+extern TD td1, td2, td1_velo, td2_pos, td2_velo;
 extern TD tdYawPc, tdPitchPc;
 
 extern float kp, kd;
